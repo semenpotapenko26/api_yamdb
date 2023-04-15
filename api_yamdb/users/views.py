@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
 from .models import User
-from .serializers import UserSerializer
+from .serializers import UserSerializer, TokenSerializer
 from .utils import send_email_confirmation
 
 
@@ -60,3 +60,26 @@ class SelfCreateUser(generics.CreateAPIView):
             status=status.HTTP_201_CREATED,
             headers=headers
         )
+
+
+@api_view(['POST',])
+def get_token(request):
+    """
+    Вью-функция для получения access token.
+    """
+    # нужно проверить токен и username
+    # выдать токен
+    if request.method == 'POST':
+        # Создаём объект сериализатора 
+        # и передаём в него данные из POST-запроса
+        serializer = CatSerializer(data=request.data)
+        if serializer.is_valid():
+            # Если полученные данные валидны —
+            # сохраняем данные в базу через save().
+            serializer.save()
+            # Возвращаем JSON со всеми данными нового объекта
+            # и статус-код 201
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # Если данные не прошли валидацию — 
+        # возвращаем информацию об ошибках и соответствующий статус-код:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
