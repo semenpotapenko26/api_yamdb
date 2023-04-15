@@ -1,7 +1,7 @@
 from rest_framework import routers
 from django.urls import path, include
 
-from .views import UserViewSet
+from .views import UserViewSet, SelfCreateUser
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -13,4 +13,5 @@ urlpatterns = [
         name="user_view_set"
     ),
     path('v1/', include(router.urls)),
+    path('v1/auth/signup/', SelfCreateUser.as_view()),
 ]
