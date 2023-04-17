@@ -1,9 +1,10 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
 from .serializers import UserSerializer, TokenSerializer
@@ -36,7 +37,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class SelfCreateUser(generics.CreateAPIView):
+class SelfCreateUserView(generics.CreateAPIView):
     """
     Вьюкласс для самостоятельной регистрации пользователей.
     """
@@ -62,24 +63,21 @@ class SelfCreateUser(generics.CreateAPIView):
         )
 
 
-@api_view(['POST',])
-def get_token(request):
+@api_view(['POST', ])
+def get_token_view(request):
     """
     Вью-функция для получения access token.
     """
-    # нужно проверить токен и username
-    # выдать токен
-    if request.method == 'POST':
-        # Создаём объект сериализатора 
-        # и передаём в него данные из POST-запроса
-        serializer = CatSerializer(data=request.data)
-        if serializer.is_valid():
-            # Если полученные данные валидны —
-            # сохраняем данные в базу через save().
-            serializer.save()
-            # Возвращаем JSON со всеми данными нового объекта
-            # и статус-код 201
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # Если данные не прошли валидацию — 
-        # возвращаем информацию об ошибках и соответствующий статус-код:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer = TokenSerializer(data=request.data)
+    if serializer.is_valid():
+        user = get_object_or_404(
+            User,
+            username=serializer.validated_data['username'],
+        )
+        refresh = RefreshToken.for_user(user)
+        data = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
