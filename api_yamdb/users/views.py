@@ -4,10 +4,12 @@ from rest_framework import status
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
+from rest_framework.permissions import AllowAny
 
 from .models import User
 from .serializers import UserSerializer
 from .utils import send_email_confirmation
+from .permissions import IsAdmin
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -16,6 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsAdmin,)
     lookup_field = 'username'
 
     @action(methods=['get', 'patch'], detail=True)
@@ -42,6 +45,7 @@ class SelfCreateUser(generics.CreateAPIView):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (AllowAny,)
 
     def perform_create(self, serializer):
         return serializer.save()
