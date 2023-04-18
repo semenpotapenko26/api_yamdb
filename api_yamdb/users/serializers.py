@@ -1,7 +1,6 @@
 from rest_framework import serializers
-from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
-from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
 
 from .models import User
 
@@ -24,10 +23,7 @@ class TokenSerializer(serializers.Serializer):
     confirmation_code = serializers.CharField(max_length=150)
 
     def validate(self, data):
-        try:
-            user = User.objects.get(username=data['username'])
-        except ObjectDoesNotExist:
-            raise serializers.ValidationError('Пользователь не найден.')
+        user = get_object_or_404(User, username=data['username'])
         if not default_token_generator.check_token(
             user,
             data['confirmation_code'],
