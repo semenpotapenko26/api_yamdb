@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, viewsets
 from reviews.models import Review, Category, Genre, Title
+
 from django.db.models import Avg
 
 from api.serializers import (TitlePostSerializer, CategorySerializer, 
