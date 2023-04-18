@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action, api_view, permission_classes
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
@@ -59,15 +59,16 @@ class SelfCreateUserView(generics.CreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response(
             {
-                "Message": "Мы отправили на указанный вами "
-                "адрес код для получения токена."
+                "email": serializer.data["email"],
+                "username": serializer.data["username"],
             },
-            status=status.HTTP_201_CREATED,
+            status=status.HTTP_200_OK,
             headers=headers
         )
 
 
 @api_view(['POST', ])
+@permission_classes([AllowAny,])
 def get_token_view(request):
     """
     Вью-функция для получения access token.

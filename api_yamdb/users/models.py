@@ -3,9 +3,9 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    USER = 0
-    MODERATOR = 1
-    ADMIN = 2
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
     USER_ROLE = [
         (USER, 'user'),
         (MODERATOR, 'moderator'),
@@ -19,4 +19,4 @@ class User(AbstractUser):
         unique=True
     )
     bio = models.TextField(max_length=500, blank=True)
-    role = models.IntegerField(choices=USER_ROLE, default=USER)
+    role = models.CharField(max_length=150, choices=USER_ROLE, default=USER)
