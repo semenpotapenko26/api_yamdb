@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.relations import SlugRelatedField
-from reviews.models import Review, Comment, Category, Genre, Title
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -70,8 +70,8 @@ class ReviewSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model=Review
-        fields='__all__'
+        model = Review
+        fields = '__all__'
 
     def validate(self, data):
         author = self.context['request'].user

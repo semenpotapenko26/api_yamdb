@@ -8,8 +8,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from reviews.models import Category, Genre, Review, Title
 
-from .mixins import CreateListDestroyViewSet
 from .filters import TitleFilter
+from .mixins import CreateListDestroyViewSet
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
@@ -33,9 +33,9 @@ class GenreViewSet(CreateListDestroyViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.order_by('id').annotate(
         rating=Avg('reviews__score')
-        )
+    )
     serializer_class = TitlePostSerializer
-    filter_backends = [DjangoFilterBackend,]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = TitleFilter
     permission_classes = [IsAdminOrReadOnly, ]
 

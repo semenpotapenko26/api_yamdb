@@ -1,20 +1,16 @@
-from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.decorators import action, api_view, permission_classes
 from django.shortcuts import get_object_or_404
-from rest_framework import generics
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
+from rest_framework import filters, generics, status, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import ValidationError
-from django.db import IntegrityError
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
-from .serializers import UserSerializer, TokenSerializer
-from .utils import send_email_confirmation
 from .permissions import IsAdmin
+from .serializers import TokenSerializer, UserSerializer
+from .utils import send_email_confirmation
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -81,7 +77,8 @@ class SelfCreateUserView(generics.CreateAPIView):
                         },
                         status=status.HTTP_200_OK,
                     )
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         user = serializer.save()
         send_email_confirmation(user)
         headers = self.get_success_headers(serializer.data)

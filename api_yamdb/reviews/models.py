@@ -1,6 +1,7 @@
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.conf import settings
+
 
 class Category(models.Model):
     name = models.CharField(max_length=200)
@@ -40,7 +41,8 @@ class Genre_Title(models.Model):
     genre = models.ForeignKey(Genre,
                               on_delete=models.CASCADE,
                               )
-                              
+
+
 class Review(models.Model):
     title = models.ForeignKey(
         Title,
@@ -104,4 +106,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text[:15]
-
