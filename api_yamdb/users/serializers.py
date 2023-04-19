@@ -18,14 +18,14 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
 
-class SelfCreateUserSerializer(serializers.Serializer):
-    username = serializers.RegexField(regex=r'^[\w.@+-]+$', max_length=150)
-    email = serializers.EmailField(max_length=254)
+# class SelfCreateUserSerializer(serializers.Serializer):
+#     username = serializers.RegexField(regex=r'^[\w.@+-]+$', max_length=150)
+#     email = serializers.EmailField(max_length=254)
 
-    def validate_username(self, value):
-        if value.lower() == 'me':
-            raise serializers.ValidationError('Нельзя использовать имя me')
-        return value
+#     def validate_username(self, value):
+#         if value.lower() == 'me':
+#             raise serializers.ValidationError('Нельзя использовать имя me')
+#         return value
 
 
 class TokenSerializer(serializers.Serializer):

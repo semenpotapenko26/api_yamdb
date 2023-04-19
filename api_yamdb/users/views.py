@@ -12,8 +12,7 @@ from rest_framework.exceptions import ValidationError
 from django.db import IntegrityError
 
 from .models import User
-from .serializers import UserSerializer, TokenSerializer, \
-    SelfCreateUserSerializer
+from .serializers import UserSerializer, TokenSerializer
 from .utils import send_email_confirmation
 from .permissions import IsAdmin
 
@@ -62,24 +61,34 @@ class SelfCreateUserView(generics.CreateAPIView):
     Вьюкласс для самостоятельной регистрации пользователей.
     """
     queryset = User.objects.all()
-    serializer_class = SelfCreateUserSerializer
+    serializer_class = UserSerializer
     permission_classes = (AllowAny,)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
         try:
-            user, created = User.objects.get_or_create(
-                **serializer.initial_data
-            )
-            send_email_confirmation(user)
-        except IntegrityError:
-            raise ValidationError()
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as exc:
+            if len(exc.detail) == 2:
+                if (
+                    exc.detail['username'][0].code == 'unique'
+                    and exc.detail['email'][0].code == 'unique'
+                ):
+                    return Response(
+                        {
+                            "username": serializer.data["username"],
+                            "email": serializer.data["email"],
+                        },
+                        status=status.HTTP_200_OK,
+                    )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user = serializer.save()
+        send_email_confirmation(user)
         headers = self.get_success_headers(serializer.data)
         return Response(
             {
-                "email": serializer.data["email"],
                 "username": serializer.data["username"],
+                "email": serializer.data["email"],
             },
             status=status.HTTP_200_OK,
             headers=headers
