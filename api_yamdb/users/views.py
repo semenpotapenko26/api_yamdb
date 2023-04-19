@@ -12,7 +12,8 @@ from rest_framework.exceptions import ValidationError
 from django.db import IntegrityError
 
 from .models import User
-from .serializers import UserSerializer, TokenSerializer, SelfCreateUserSerializer
+from .serializers import UserSerializer, TokenSerializer, \
+    SelfCreateUserSerializer
 from .utils import send_email_confirmation
 from .permissions import IsAdmin
 
@@ -83,35 +84,6 @@ class SelfCreateUserView(generics.CreateAPIView):
             status=status.HTTP_200_OK,
             headers=headers
         )
-
-        # if serializer.is_valid():
-        #     user = serializer.save()
-        #     send_email_confirmation(user)
-        #     headers = self.get_success_headers(serializer.data)
-        #     return Response(
-        #         {
-        #             "email": serializer.data["email"],
-        #             "username": serializer.data["username"],
-        #         },
-        #         status=status.HTTP_200_OK,
-        #         headers=headers
-        #     )
-        # try:
-        #     user, created = User.objects.get_or_create(
-        #         **serializer.initial_data
-        #     )
-        #     if user:
-        #         return Response(
-        #             {
-        #                 "email": user.email,
-        #                 "username": user.username,
-        #             },
-        #             status=status.HTTP_200_OK
-        #         )
-        # except IntegrityError:
-        #     raise ValidationError()
-
-        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST', ])
