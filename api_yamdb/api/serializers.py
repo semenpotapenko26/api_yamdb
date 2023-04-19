@@ -1,8 +1,10 @@
 import datetime as dt
 
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.relations import SlugRelatedField
-from reviews.models import Category, Genre, Title
+from reviews.models import Review, Comment, Category, Genre, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -54,3 +56,46 @@ class TitlePostSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 f'Сейчас {year} год. Назад в будущее!!!')
         return value
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    title = serializers.SlugRelatedField(
+        slug_field="name",
+        read_only=True
+    )
+    author = serializers.SlugRelatedField(
+        slug_field="username",
+        read_only=True,
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta:
+        model=Review
+        fields='__all__'
+
+    def validate(self, data):
+        author = self.context['request'].user
+        title = get_object_or_404(
+            Title,
+            pk=self.context['view'].kwargs.get('title_id')
+        )
+        if self.context['request'].method == 'POST':
+            if Review.objects.filter(title=title, author=author).exists():
+                raise ValidationError('Для данного произведения '
+                                      'Вы уже оставили отзыв')
+        return data
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    review = serializers.SlugRelatedField(
+        slug_field='text',
+        read_only=True
+    )
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
