@@ -1,7 +1,5 @@
 from rest_framework import permissions
-
-from .models import User
-from users.constants import MODERATOR, ADMIN
+from users.constants import ADMIN, MODERATOR
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from .constants import USER_ROLE, USER
+from .constants import USER, USER_ROLE
 
 
 class User(AbstractUser):
