@@ -34,20 +34,22 @@ class MeViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated, )
 
-    @action(methods=['get', 'patch'], detail=True)
+    @action(detail=True, methods=['patch'])
     def me(self, request):
+        """Change user info partial."""
         serializer = self.get_serializer_class()
         user = get_object_or_404(User, username=request.user.username)
-        if self.request.method == 'PATCH':
-            serializer = serializer(user, request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save(role=user.role)
-                return Response(
-                    serializer.data, status=status.HTTP_200_OK
-                )
-            return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer = serializer(user, request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save(role=user.role)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @me.mapping.get
+    def get_me(self, request):
+        """Get user info."""
+        serializer = self.get_serializer_class()
+        user = get_object_or_404(User, username=request.user.username)
         serializer = serializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -65,18 +67,18 @@ class SelfCreateUserView(generics.CreateAPIView):
         try:
             serializer.is_valid(raise_exception=True)
         except ValidationError as exc:
-            if len(exc.detail) == 2:
-                if (
-                    exc.detail['username'][0].code == 'unique'
-                    and exc.detail['email'][0].code == 'unique'
-                ):
-                    return Response(
-                        {
-                            "username": serializer.data["username"],
-                            "email": serializer.data["email"],
-                        },
-                        status=status.HTTP_200_OK,
-                    )
+            if (
+                len(exc.detail) == 2
+                and exc.detail['username'][0].code == 'unique'
+                and exc.detail['email'][0].code == 'unique'
+            ):
+                return Response(
+                    {
+                        "username": serializer.data["username"],
+                        "email": serializer.data["email"],
+                    },
+                    status=status.HTTP_200_OK,
+                )
             return Response(
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         user = serializer.save()
