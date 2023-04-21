@@ -72,25 +72,18 @@ class SelfCreateUserView(generics.CreateAPIView):
                 and exc.detail['username'][0].code == 'unique'
                 and exc.detail['email'][0].code == 'unique'
             ):
-                return Response(
-                    {
-                        "username": serializer.data["username"],
-                        "email": serializer.data["email"],
-                    },
-                    status=status.HTTP_200_OK,
-                )
+                return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
         user = serializer.save()
         send_email_confirmation(user)
-        headers = self.get_success_headers(serializer.data)
         return Response(
             {
                 "username": serializer.data["username"],
                 "email": serializer.data["email"],
             },
             status=status.HTTP_200_OK,
-            headers=headers
         )
 
 
