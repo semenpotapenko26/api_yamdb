@@ -2,27 +2,29 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from .constants import TEXT_COMMENT
+
 
 class Category(models.Model):
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=200, help_text="Название категории")
+    slug = models.SlugField(unique=True, help_text="Slug категории")
 
     def __str__(self):
         return self.name
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=200, help_text="Название жанра")
+    slug = models.SlugField(unique=True, help_text="Slug жанра")
 
     def __str__(self):
         return self.name
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=200)
-    year = models.IntegerField()
-    description = models.TextField()
+    name = models.CharField(max_length=200, help_text="Название произведения")
+    year = models.IntegerField(help_text="Год создания")
+    description = models.TextField(help_text="Описание")
     category = models.ForeignKey(Category,
                                  on_delete=models.SET_NULL,
                                  null=True,
@@ -56,18 +58,14 @@ class Review(models.Model):
         related_name='reviews',
         verbose_name='Автор отзыва',
     )
-    text = models.TextField('Текст отзыва')
+    text = models.TextField(help_text="Текст отзыва")
     score = models.PositiveSmallIntegerField(
-        'Рейтинг',
+        help_text="Рейтинг",
         validators=[
-            MinValueValidator(1, 'Минимально 1',),
-            MaxValueValidator(10, 'Максимально 10',)
-        ],
-    )
+            MinValueValidator(1, 'Минимально 1'),
+            MaxValueValidator(10, 'Максимально 10')],)
     pub_date = models.DateTimeField(
-        'Дата публикации',
-        auto_now_add=True
-    )
+        help_text="Дата публикации", auto_now_add=True)
 
     class Meta:
         ordering = ('-pub_date',)
@@ -79,7 +77,7 @@ class Review(models.Model):
         )
 
     def __str__(self):
-        return self.text[:15]
+        return self.text[:TEXT_COMMENT]
 
 
 class Comment(models.Model):
@@ -105,4 +103,4 @@ class Comment(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.text[:15]
+        return self.text[:TEXT_COMMENT]

@@ -1,6 +1,5 @@
-import datetime as dt
-
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.relations import SlugRelatedField
@@ -30,8 +29,7 @@ class TitleGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year',
-                  'rating', 'description', 'genre', 'category')
+        fields = '__all__'
 
 
 class TitlePostSerializer(serializers.ModelSerializer):
@@ -44,14 +42,14 @@ class TitlePostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        fields = '__all__'
 
     def to_representation(self, instance):
         serializer = TitleGetSerializer(instance)
         return serializer.data
 
     def validate_year(self, value):
-        year = dt.date.today().year
+        year = timezone.now().year
         if value > year:
             raise serializers.ValidationError(
                 f'Сейчас {year} год. Назад в будущее!!!')

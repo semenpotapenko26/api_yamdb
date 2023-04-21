@@ -18,7 +18,7 @@ class CategoryViewSet(CreateListDestroyViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = "slug"
-    permission_classes = [IsAdminOrReadOnly, ]
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class GenreViewSet(CreateListDestroyViewSet):
@@ -27,7 +27,7 @@ class GenreViewSet(CreateListDestroyViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = "slug"
-    permission_classes = [IsAdminOrReadOnly, ]
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -35,14 +35,14 @@ class TitleViewSet(viewsets.ModelViewSet):
         rating=Avg('reviews__score')
     )
     serializer_class = TitlePostSerializer
-    filter_backends = [DjangoFilterBackend, ]
+    filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
-    permission_classes = [IsAdminOrReadOnly, ]
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAdminOrModeratorOrReadOnly]
+    permission_classes = (IsAdminOrModeratorOrReadOnly,)
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
@@ -55,7 +55,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAdminOrModeratorOrReadOnly]
+    permission_classes = (IsAdminOrModeratorOrReadOnly,)
 
     def get_queryset(self):
         review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
