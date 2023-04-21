@@ -11,7 +11,6 @@ def send_email_confirmation(user):
     token = default_token_generator.make_token(user)
     recipients = []
     recipients.append(user.email)
-    print(user.email)
     send_mail(
         'Ya MDB | Подтверждение учетной записи',
         f'confirmation_code - {token}',
