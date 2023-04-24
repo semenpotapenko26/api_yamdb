@@ -63,12 +63,14 @@ class SelfCreateUserView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
 
     def create(self, request, *args, **kwargs):
+        COUNT_UNIQUE_ERROR = 2
+
         serializer = self.get_serializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
         except ValidationError as exc:
             if (
-                len(exc.detail) == 2
+                len(exc.detail) == COUNT_UNIQUE_ERROR
                 and exc.detail['username'][0].code == 'unique'
                 and exc.detail['email'][0].code == 'unique'
             ):
@@ -78,13 +80,7 @@ class SelfCreateUserView(generics.CreateAPIView):
             )
         user = serializer.save()
         send_email_confirmation(user)
-        return Response(
-            {
-                "username": serializer.data["username"],
-                "email": serializer.data["email"],
-            },
-            status=status.HTTP_200_OK,
-        )
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST', ])
